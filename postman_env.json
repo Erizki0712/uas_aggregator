@@ -1,0 +1,19 @@
+{
+	"id": "e1a2b3c4-d5e6-7890-1234-567890abcdef",
+	"name": "Local Log Aggregator",
+	"values": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "fixed_event_id",
+			"value": "demo-duplicate-id-999",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment"
+}

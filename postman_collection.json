@@ -1,0 +1,125 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+		"name": "uas sister",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Check Stats",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/stats",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"stats"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Publish Unique Event",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"current_uuid\", crypto.randomUUID());",
+							"pm.environment.set(\"current_ts\", new Date().toISOString());"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"topic\": \"demo-topic\",\n    \"event_id\": \"{{current_uuid}}\",\n    \"timestamp\": \"{{current_ts}}\",\n    \"source\": \"postman\",\n    \"payload\": {\n        \"message\": \"This is a unique event\",\n        \"value\": 100\n    }\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/publish",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"publish"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Publish DUPLICATE Event",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Kita menggunakan fixed_event_id dari Environment",
+							"pm.environment.set(\"current_ts\", new Date().toISOString());"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"topic\": \"demo-dedup\",\n    \"event_id\": \"{{fixed_event_id}}\",\n    \"timestamp\": \"{{current_ts}}\",\n    \"source\": \"postman-duplicate-test\",\n    \"payload\": {\n        \"message\": \"This event should only appear ONCE in DB\",\n        \"attempt\": \"multiple\"\n    }\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/publish",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"publish"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Events (Filtered)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/events?topic=demo-dedup",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"events"
+					],
+					"query": [
+						{
+							"key": "topic",
+							"value": "demo-dedup"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
